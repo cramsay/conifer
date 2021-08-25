@@ -10,7 +10,7 @@ import Test.QuickCheck
 import Test.QuickCheck.Monadic (assert, monadicIO, PropertyM, run)
 import Test.Hspec
 import Graph.MCM_TH
-import Coeffs
+import ExampleCoeffs
 
 import Prelude
 import Data.Map.Strict hiding (map, toList)

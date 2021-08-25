@@ -10,7 +10,7 @@ import Clash.Prelude (KnownNat, Signed, Signal, NFDataX, SNat(..), simulate, sim
 import Test.QuickCheck hiding (sample, resize)
 import Test.Hspec
 import Util
-import Coeffs
+import ExampleCoeffs
 import Filter.SerialSpec hiding (spec)
 import Filter.FFA_TH
 import Data.Reflection (reifyNat)

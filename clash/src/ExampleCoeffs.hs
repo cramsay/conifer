@@ -1,7 +1,8 @@
-module Coeffs (
+module ExampleCoeffs (
    coeffsHpls
   ,coeffsLpls
   ,coeffsBpls
+  ,coeffsMovAvg
   ) where
 
 import Clash.Prelude
@@ -46,3 +47,8 @@ coeffsLpls = $(listToVecTH
                ,(-214), 97, 234, 111, (-83), (-142), (-50), 60, 78, 19, (-36)
                ,(-37), (-5), 17, 14, 1
                ])
+
+-- Set of 0xFFFF coefficients, for a scaled moving average.
+-- This is really just to test for overflow!
+coeffsMovAvg :: Vec 16 (Signed 16)
+coeffsMovAvg = repeat maxBound

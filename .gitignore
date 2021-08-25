@@ -2,3 +2,4 @@ build
 yosys_svg
 ref
 clash/dist-newstyle
+clash/dist

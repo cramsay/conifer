@@ -15,7 +15,7 @@ import Control.Monad (forM_)
 
 import Filter.FFA (listSplit, listFlatten)
 import Filter.Serial
-import Coeffs
+import ExampleCoeffs
 
 refFir :: KnownNat n => Vec (1+n) (Signed 16) -> [Signed 16] -> [Signed 32]
 refFir coeffs inputs = drop 1 $ simulate @System (firDirect (Clash.map resize coeffs)) ((0 :: Signed 32) : map resize inputs ++ repeat 0)
