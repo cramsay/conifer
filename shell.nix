@@ -7,6 +7,12 @@ let
            ref = "refs/heads/nixpkgs-unstable";                     
            rev = "2c162d49cd5b979eb66ff1653aecaeaa01690fcc";
        }) {};    
+
+  haskellPackages = pkgs.haskellPackages.override {
+    overrides = self: super: {
+      conifer = self.callPackage clash/default.nix {};
+    };
+  };
 in
 
 with pkgs;
@@ -18,7 +24,6 @@ mkShell {
     # My own packages...
     #yosys
     #graphviz
-    cabal-install
 
     #(python36.buildEnv.override {
     #  extraLibs = with python36Packages; [
@@ -28,7 +33,7 @@ mkShell {
     #})
 
     # For quick clash experimentation
-    (pkgs.haskellPackages.ghcWithPackages (p: with p; [
+    (haskellPackages.ghcWithPackages (p: with p; [
       clash-ghc
       ghc-typelits-extra
       ghc-typelits-knownnat
@@ -36,7 +41,10 @@ mkShell {
       Chart-cairo
       zlib
       hspec
+      conifer
     ])
     )
   ];
 }
+
+#pkgs.haskellPackages.ghcWithPackages.callCabal2nix "conifer" ./clash/conifer.cabal {}
