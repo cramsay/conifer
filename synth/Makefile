@@ -1,28 +1,36 @@
 CLASH = clash
-CLASH_OPTS = -fconstraint-solver-iterations=20 -fclash-inline-limit=200 -fclash-spec-limit=1000 
-BUILD_DIR = build/clash/SamFilters.hs
-VHDL = build/clash/vhdl/SamFilters/topCoarseDec/topCoarseDec.vhdl
-IP = build/xil/ip/component.xml
+CLASH_OPTS = -fconstraint-solver-iterations=20 -fclash-inline-limit=200 -fclash-spec-limit=1000 -fexpose-all-unfoldings -fno-worker-wrapper
+FIR_SRC = Filter.hs
+VHDL = vhdl/Main/filter/filter.vhdl
+VERILOG = verilog/Main/filter/filter.v
+IMPL = post_route.dcp
 
-all: $(IP)
+all: $(IMPL)
 
-$(IP): $(VHDL)
-	cd build/xil; vivado -mode batch -source mk_ip.tcl
+$(VHDL): $(FIR_SRC)
+	$(CLASH) $(CLASH_OPTS) --vhdl $(FIR_SRC);
 
-$(VHDL): $(BUILD_DIR)
-	cd build/clash; $(CLASH) $(CLASH_OPTS) --vhdl SamFilters.hs;
+$(VERILOG): $(FIR_SRC)
+	$(CLASH) $(CLASH_OPTS) --verilog $(FIR_SRC);
 
-build_dir: $(BUILD_DIR)
-
-$(BUILD_DIR):
-	mkdir build
-	cp -r src/* build
-
-vivado_raw: $(VHDL)
-		cd build/xil; vivado -mode batch -source prj_raw.tcl
-
-yosys: $(VHDL)
-	cd  build/clash/verilog/Top/fir_rsg; yosys -s ../../../../yosys/view_synth.yosys
+$(IMPL): $(VHDL)
+	vivado -mode batch -source synth.tcl
 
 clean:
-	rm -r build
+	rm -r *.rpt *.dcp *.o *.hi hd_visual verilog vhdl vivado.jou vivado.log
+
+shrink: # Remove intermediate files, keeping final results
+	rm -r *.o *.hi hd_visual verilog vhdl vivado.jou vivado.log
+
+
+# And now targets with human names...
+
+vhdl: $(VHDL)
+
+verilog: $(VERILOG)
+
+impl: $(IMPL)
+
+yosys: $(VERILOG)
+	yosys -s view_synth.yosys
+

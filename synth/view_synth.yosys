@@ -1,3 +1,3 @@
-read_verilog *.v
+read_verilog verilog/Main/filter/*.v
 hierarchy; proc; flatten; opt; opt_clean -purge
-show fir_rsg
+show filter

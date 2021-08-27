@@ -21,18 +21,16 @@ mkShell {
   name = "clash-compiler-shell";
   shellHook = "source /tools/Xilinx/Vivado/2019.1/settings64.sh";
   buildInputs = [
-    # My own packages...
-    #yosys
-    #graphviz
 
-    #(python36.buildEnv.override {
-    #  extraLibs = with python36Packages; [
-    #    # Add pythonPackages without the prefix
-	#xdot
-    #  ];
-    #})
+    yosys
+    graphviz
 
-    # For quick clash experimentation
+    (python36.buildEnv.override {
+      extraLibs = with python36Packages; [
+	      xdot
+      ];
+    })
+
     (haskellPackages.ghcWithPackages (p: with p; [
       clash-ghc
       ghc-typelits-extra
@@ -46,5 +44,3 @@ mkShell {
     )
   ];
 }
-
-#pkgs.haskellPackages.ghcWithPackages.callCabal2nix "conifer" ./clash/conifer.cabal {}
