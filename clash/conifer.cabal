@@ -112,6 +112,8 @@ test-suite conifer-test
       ,Graph.MCMSpec
       ,Graph.MCM_TH
       ,Util
+  other-modules:
+      Paths_conifer
       
   build-depends:
        base >=4.13 && <4.14

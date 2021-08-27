@@ -51,7 +51,7 @@ prop_FirPoly _ (EVec p _ _ coeffs) inputs = exp === got
     = take (length inputs)
     $ refFir coeffs inputs
   got
-    = take (length inputs) . listFlatten . drop 1
+    = take (length inputs) . listFlatten . drop (1 + ceiling (logBase 2 (snatToNum p)))
     $ simulate @System (polyphase p firDirect coeffs)
                        (padVecInput p inputs)
 
@@ -70,7 +70,7 @@ prop_FirPolyMCM _ delay (EVec p _ _ coeffs) inputs = exp === got
     = take (length inputs)
     $ refFir coeffs inputs
   got
-    = take (length inputs) . listFlatten . drop (delay' + 2)
+    = take (length inputs) . listFlatten . drop (delay' + 2 + ceiling (logBase 2 (snatToNum p)))
     $ reifyNat (toInteger delay')
     (\dp -> simulate @System (polyphase_MCM p (refMCMCircuit (snatProxy dp) coeffs) )
                              (padVecInput p inputs)

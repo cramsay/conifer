@@ -19,7 +19,6 @@ with pkgs;
 
 mkShell {
   name = "clash-compiler-shell";
-  shellHook = "source /tools/Xilinx/Vivado/2019.1/settings64.sh";
   buildInputs = [
 
     yosys

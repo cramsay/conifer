@@ -39,7 +39,7 @@ prop_FirFFA_TH p n = [|
             = take (length inputs)
             $ refFir coeffs inputs
           got
-            = take (length inputs) . listFlatten . drop (1 + round (logBase 2 (snatToNum p)))
+            = take (length inputs) . listFlatten . drop (1 + 2 * (round (logBase 2 (snatToNum p))))
             $ simulate @System ($(genFFA p) firDirect coeffs)
                                (padVecInput p inputs)
     in \c i -> prop (c `asTypeOf` Clash.replicate n (def :: Signed 19))
@@ -62,7 +62,7 @@ prop_FirFFA_MCM_TH p d coeffs = [|
             = take (length inputs)
             $ refFir coeffs inputs
           got
-            = take (length inputs) . listFlatten . drop (2 + snatToNum d +  round (logBase 2 (snatToNum p)))
+            = take (length inputs) . listFlatten . drop (2 + snatToNum d + 2 * (round (logBase 2 (snatToNum p))))
             $ simulate @System
               $(let mcm ws = [| refMCMCircuit d $(listToVecTH (ws :: [Signed 19])) |]
                 in genFFA_MCM mcm p coeffs)

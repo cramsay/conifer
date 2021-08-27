@@ -78,15 +78,14 @@ fp_pre_rec ::
   (Vec (2^n) (Signal dom a) -> Vec (3^n) (Signal dom a)) ->
   Vec (2^(n+1)) (Signal dom a) ->
   Vec (3^(n+1)) (Signal dom a)
-fp_pre_rec f x = let evens = head $ vecSplit d2 x
-                     odds  = last $ vecSplit d2 x
+fp_pre_rec f x = let x' = map (register 0) x
+                     evens = head $ vecSplit d2 x'
+                     odds  = last $ vecSplit d2 x'
                      mids  = zipWith (+) evens odds
                      evens' = f evens
                      odds'  = f odds
                      mids'  = f mids
                  in evens' ++ mids' ++ odds'
-                 -- If we're going to pipeline this, do it on the input to avoid
-                 -- imbalance
 
 fp_filt_rec ::
      ( HiddenClockResetEnable dom
@@ -119,7 +118,6 @@ fp_post_rec swap_f rec_f xs =
       swps_d = zipWith ($) (delay def +>> repeat id) swps
       evens = map (delay def) $ zipWith (+) (xs' !! 0) swps_d
   in evens ++ odds
-  -- TODO Is there an extra delay stage in here?
 
 --------------------------------------------------------------------------------
 -- If we wanted to define our x2, x4, and x8 filters without template haskell,
