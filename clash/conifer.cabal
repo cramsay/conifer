@@ -15,6 +15,8 @@ maintainer:          craig.ramsay.100@strath.ac.uk
 category:            Hardware
 build-type:          Simple
 extra-source-files:  CHANGELOG.md
+data-files:          LutMinCost.bin, LutMinDepth.bin
+data-dir:            data
 
 library
   exposed-modules:
@@ -37,7 +39,8 @@ library
       ,Graph.RSG
       ,Graph.GenerateLuts
 
-  -- other-modules:
+  other-modules:
+      Paths_conifer
   default-extensions:  
        ScopedTypeVariables
       ,NoImplicitPrelude
@@ -70,6 +73,7 @@ library
       ,DeriveGeneric
       ,DeriveLift
       ,TypeOperators
+      ,CPP
 
   build-depends:
        base >=4.13 && <4.14
@@ -85,6 +89,7 @@ library
       ,zlib >=0.6 && <0.7
       ,bytestring >=0.10 && <0.11
       ,ghc-typelits-natnormalise
+      ,file-embed
       ,ghc-typelits-knownnat
       ,ghc-typelits-extra
 

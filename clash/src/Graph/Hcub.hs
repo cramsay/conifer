@@ -19,7 +19,6 @@ import Data.Maybe (listToMaybe, fromMaybe, fromJust, isJust)
 import Data.Ratio
 import Control.Monad.Reader
 
-
 hcubConfig :: [Fundamental] -> IO (McmConfig AOdd)
 hcubConfig ws =
   let bits = ceiling $ logBase 2 (fromIntegral $ maximum ws)

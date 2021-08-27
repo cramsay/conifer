@@ -1,5 +1,6 @@
 module ExampleFilters where
 
+{-
 import Clash.Prelude
 
 import Filter.FFA
@@ -62,7 +63,7 @@ firPolyDirect coeffs xs = polyphase (SNat :: SNat p) firDirect (map resize coeff
 -- RAGn MCM algorithm instead of Hcub.
 firPolyMCM_LP :: (KnownNat a, HiddenClockResetEnable dom)
               => Signal dom (Vec 8 (Signed a))
-              -> Signal dom (Vec 8 (Signed (a+16+CLog 2 8 + CLog 2 8))
+              -> Signal dom (Vec 8 (Signed (a+16+CLog 2 8 + CLog 2 8)))
               -- 8 = parallelism, 16 = coeff wordlength, (8*8) = number of coefficients
 firPolyMCM_LP xs = polyphase_MCM
                      (SNat :: SNat 8)
@@ -131,3 +132,4 @@ createDomain vSystem{vName="SystemNR", vResetPolarity=ActiveLow}
 topEntity c r x = exposeClockResetEnable
                     (firFFA_MCM_HP @16 @SystemNR x)
                     c r (toEnable $ pure True)
+-}

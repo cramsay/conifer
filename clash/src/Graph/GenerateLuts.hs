@@ -7,5 +7,5 @@ import Graph.Aop
 main = do
   let lutMinCost = costGraphs (AOdd 20) [verticeSumMetric]
   let lutMinDepth = costGraphs (AOdd 20) [depthMetric, verticeSumMetric]
-  saveLUT "./LutMinCost.bin" lutMinCost
-  saveLUT "./LutMinDepth.bin" lutMinDepth
+  saveLUT "LutMinCost.bin"  lutMinCost
+  saveLUT "LutMinDepth.bin" lutMinDepth

@@ -15,6 +15,7 @@ import Control.Applicative (liftA2)
 import Data.Binary -- (encodeFile, decodeFile, Binary)
 import Codec.Compression.GZip
 import qualified Data.ByteString.Lazy as B
+import Paths_conifer
 
 import Graph.Aop
 
@@ -247,7 +248,12 @@ lowCostGraphs constr metrics =
   select = selectByMetrics metrics
 
 saveLUT :: FilePath -> SCMLookup -> IO ()
-saveLUT f lut = B.writeFile f . compress $ encode lut
+saveLUT f lut
+  = do fd <- getDataFileName f
+       B.writeFile fd . compress $ encode lut
 
 loadLUT :: FilePath -> IO SCMLookup
-loadLUT f = fmap (decode . decompress) $ B.readFile f
+loadLUT f
+   = do fd <- getDataFileName f
+        raw <- B.readFile fd
+        return $ decode $ decompress raw

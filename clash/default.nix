@@ -1,5 +1,5 @@
 { mkDerivation, base, binary, bytestring, clash-prelude, containers
-, ghc-typelits-extra, ghc-typelits-knownnat
+, file-embed, ghc-typelits-extra, ghc-typelits-knownnat
 , ghc-typelits-natnormalise, hspec, lib, mtl, process, QuickCheck
 , reflection, singletons, template-haskell, zlib
 }:
@@ -8,9 +8,9 @@ mkDerivation {
   version = "0.1.0.0";
   src = ./.;
   libraryHaskellDepends = [
-    base binary bytestring clash-prelude containers ghc-typelits-extra
-    ghc-typelits-knownnat ghc-typelits-natnormalise mtl process
-    QuickCheck reflection singletons template-haskell zlib
+    base binary bytestring clash-prelude containers file-embed
+    ghc-typelits-extra ghc-typelits-knownnat ghc-typelits-natnormalise
+    mtl process QuickCheck reflection singletons template-haskell zlib
   ];
   testHaskellDepends = [
     base binary bytestring clash-prelude containers ghc-typelits-extra
