@@ -100,7 +100,7 @@ test-suite conifer-test
   main-is:             Spec.hs
 
   other-modules:
-      ,Filter.FFASpec
+       Filter.FFASpec
       ,Filter.FFA_TH
       ,Filter.PolyphaseSpec
       ,Filter.SerialSpec

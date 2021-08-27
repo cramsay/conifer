@@ -53,7 +53,7 @@ firPolyDirect :: forall p c a n dom
               .  (KnownNat p, KnownNat c, KnownNat a, KnownNat n, HiddenClockResetEnable dom, 1<=p)
               => Vec ((1+n)*p) (Signed c)
               -> Signal dom (Vec p (Signed a))
-              -> Signal dom (Vec p (Signed (a+c+CLog 2 (1+n)+(p-1))))
+              -> Signal dom (Vec p (Signed (a+c + CLog 2 (1+n) + CLog 2 p)))
 firPolyDirect coeffs xs = polyphase (SNat :: SNat p) firDirect (map resize coeffs) (fmap (map resize) xs)
 
 -- Now we generate a polyphase FIR filter using an MCM block. We need to supply
@@ -62,8 +62,8 @@ firPolyDirect coeffs xs = polyphase (SNat :: SNat p) firDirect (map resize coeff
 -- RAGn MCM algorithm instead of Hcub.
 firPolyMCM_LP :: (KnownNat a, HiddenClockResetEnable dom)
               => Signal dom (Vec 8 (Signed a))
-              -> Signal dom (Vec 8 (Signed (a+16+CLog 2 64 + (8-1))))
-              -- 8 = parallelism, 16 = coeff wordlength, 64 = number of coefficients
+              -> Signal dom (Vec 8 (Signed (a+16+CLog 2 8 + CLog 2 8))
+              -- 8 = parallelism, 16 = coeff wordlength, (8*8) = number of coefficients
 firPolyMCM_LP xs = polyphase_MCM
                      (SNat :: SNat 8)
                      $(mcmPipelinedHwTH RAGn (toList $ map fromIntegral coeffsLpls))
@@ -83,7 +83,7 @@ firFFADirect :: forall c a n dom
               .  (KnownNat c, KnownNat a, KnownNat n, HiddenClockResetEnable dom)
               => Vec ((1+n)*16) (Signed c)
               -> Signal dom (Vec 16 (Signed a))
-              -> Signal dom (Vec 16 (Signed (a+c+CLog 2 (1+n)+2*(CLog 2 16) + 16 `Div` 2 )))
+              -> Signal dom (Vec 16 (Signed (a+c+CLog 2 (1+n)+ 4*(CLog 2 16))))
 firFFADirect coeffs xs = $(genFFA (SNat :: SNat 16))
                              firDirect
                              (map resize coeffs)
@@ -99,15 +99,12 @@ firFFADirect coeffs xs = $(genFFA (SNat :: SNat 16))
 firFFA_MCM_HP :: forall a dom
               .  (KnownNat a, HiddenClockResetEnable dom)
               => Signal dom (Vec 8 (Signed a))
-              -> Signal dom (Vec 8 (Signed (a+16+CLog 2 16+2*(CLog 2 8) + 8 `Div` 2 )))
+              -> Signal dom (Vec 8 (Signed (a+16+CLog 2 16+ 4*(CLog 2 8))))
               -- 8 = parallelism, 16 = coefficient wordlength, 16 = number of coefficients
 firFFA_MCM_HP xs = $(genFFA_MCM (mcmPipelinedDepthHwTH HcubShallow 3)
                                 (SNat :: SNat 8)
                                 (map fromIntegral coeffsHpls)
                     ) (fmap (map resize) xs)
-
--- Make a wee quickCheck vs Int implementation of fir. Reduce the wordlength
--- growth by one and see what happends (did I get my type eqns right?)
 
 --------------------------------------------------------------------------------
 -- Synthesis Example
@@ -131,11 +128,6 @@ createDomain vSystem{vName="SystemNR", vResetPolarity=ActiveLow}
     , t_output = PortName "y"
     }) #-}
 
---topEntity
-  -- :: Clock  SystemNR
-  -- -> Reset  SystemNR
-  -- -> Signal SystemNR (Vec 4 (Signed 16))
-  -- -> Signal SystemNR (Vec 4 (Signed 16)) -- (Unsigned (16+12+CLog 2 10)))
 topEntity c r x = exposeClockResetEnable
                     (firFFA_MCM_HP @16 @SystemNR x)
                     c r (toEnable $ pure True)
