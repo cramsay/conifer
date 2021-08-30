@@ -6,11 +6,15 @@ module Filter.Polyphase (
 import Clash.Prelude
 import Filter.Serial
 
-recombFs :: (HiddenClockResetEnable dom, KnownNat n, NFDataX a, Num a)
-         => Vec n (Vec n (Signal dom a) -> Vec n (Signal dom a))
-recombFs = iterateI f id
+reorder :: forall i dom n a . (HiddenClockResetEnable dom, KnownNat n, NFDataX a, Num a)
+         => SNat i -> Vec n (Signal dom a) -> Vec n (Signal dom a)
+reorder i xs = smap delayFsts $ rotateRightS xs i
   where
-    f acf = zipWith ($) (delay 0 +>> (repeat id)) . flip rotateRightS d1 . acf
+    delayFsts :: forall j dom a . (HiddenClockResetEnable dom, NFDataX a, Num a)
+              => SNat j -> Signal dom a -> Signal dom a
+    delayFsts j a = case (i `compareSNat` j) of
+      SNatLE -> a
+      SNatGT -> delay 0 a
 
 polyphase :: (HiddenClockResetEnable dom, KnownNat m, KnownNat n, NFDataX a, Default a, Num a)
           => SNat (n+1)
@@ -21,7 +25,7 @@ polyphase n fir ws xs =
   let xsMat = map (replicate n) $ unbundle xs
       firs = map fir (transpose $ unconcat n ws)
       filtedMat = map (zipWith ($) firs) xsMat
-      transpMat = zipWith ($) recombFs filtedMat
+      transpMat = smap reorder filtedMat
       ys = fold (zipWith (\a b -> register 0 $ a+b)) transpMat
   in bundle ys
 
@@ -33,6 +37,6 @@ polyphase_MCM n mcm xs =
   let filterPhase x = map (flip firTransposeMCM x)
                           (map const (transpose . unconcat n $ mcm x))
       filtedMat = map filterPhase $ unbundle xs
-      transpMat = zipWith ($) recombFs filtedMat
+      transpMat = smap reorder filtedMat
       ys = fold (zipWith (\a b -> register 0 $ a+b)) transpMat
   in bundle ys

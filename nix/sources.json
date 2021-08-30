@@ -1,0 +1,98 @@
+{
+    "ghc-tcplugins-extra": {
+        "branch": "master",
+        "description": "",
+        "homepage": null,
+        "owner": "clash-lang",
+        "repo": "ghc-tcplugins-extra",
+        "rev": "380e4510ae94e6b6cfb1bcacf633437e2c7226a4",
+        "sha256": "0fwfjvqw4k9lk23xrysiw54khfcif2s2cg52zwkgd0wbhjg6rrmd",
+        "type": "tarball",
+        "url": "https://github.com/clash-lang/ghc-tcplugins-extra/archive/380e4510ae94e6b6cfb1bcacf633437e2c7226a4.tar.gz",
+        "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
+    },
+    "ghc-typelits-extra": {
+        "branch": "master",
+        "description": "Extra type-level operations on GHC.TypeLits.Nat and a custom solver",
+        "homepage": null,
+        "owner": "clash-lang",
+        "repo": "ghc-typelits-extra",
+        "rev": "2f1ee7c0e5322177b8a20151d51b358dd2691b1f",
+        "sha256": "04akli0l7xd49hl0k23xbwhpijsl33jd59dcpkrnfjljby7nd398",
+        "type": "tarball",
+        "url": "https://github.com/clash-lang/ghc-typelits-extra/archive/2f1ee7c0e5322177b8a20151d51b358dd2691b1f.tar.gz",
+        "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
+    },
+    "ghc-typelits-knownnat": {
+        "branch": "master",
+        "description": "Derive KnownNat constraints from other KnownNat constraints",
+        "homepage": null,
+        "owner": "clash-lang",
+        "repo": "ghc-typelits-knownnat",
+        "rev": "7801a3485769eb26ee7a00d1e4989a04b19a1850",
+        "sha256": "1m0kmkgcw0kf6w95fg8cf29r50i1br4xp078iwf3hkb1kzs9z9m7",
+        "type": "tarball",
+        "url": "https://github.com/clash-lang/ghc-typelits-knownnat/archive/7801a3485769eb26ee7a00d1e4989a04b19a1850.tar.gz",
+        "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
+    },
+    "ghc-typelits-natnormalise": {
+        "branch": "master",
+        "description": "GHC typechecker plugin for types of kind GHC.TypeLits.Nat",
+        "homepage": null,
+        "owner": "clash-lang",
+        "repo": "ghc-typelits-natnormalise",
+        "rev": "91d80e63378ac4009f0475f54c54f81eca4de0ed",
+        "sha256": "1dy9kilvc9nfql64fs79pxaa57dh8dvhkmlx79ghwlgxn6v2ksva",
+        "type": "tarball",
+        "url": "https://github.com/clash-lang/ghc-typelits-natnormalise/archive/91d80e63378ac4009f0475f54c54f81eca4de0ed.tar.gz",
+        "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
+    },
+    "clash-compiler": {
+        "branch": "master",
+        "description": "Clash compiler",
+        "homepage": null,
+        "owner": "clash-lang",
+        "repo": "clash-compiler",
+        "rev": "3c5c7559ab5ebd5720b656cec03c89c0894b13c0",
+        "sha256": "0h01plv3w4rli6rng9kkw0jp206p142dbb8nd5j54rg7h6qwvlzd",
+        "type": "tarball",
+        "url": "https://github.com/clash-lang/clash-compiler/archive/3c5c7559ab5ebd5720b656cec03c89c0894b13c0.tar.gz",
+        "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
+    },
+    "gitignore": {
+        "branch": "master",
+        "description": "Nix function for filtering local git sources",
+        "homepage": "",
+        "owner": "hercules-ci",
+        "repo": "gitignore",
+        "rev": "c4662e662462e7bf3c2a968483478a665d00e717",
+        "sha256": "1npnx0h6bd0d7ql93ka7azhj40zgjp815fw2r6smg8ch9p7mzdlx",
+        "type": "tarball",
+        "url": "https://github.com/hercules-ci/gitignore/archive/c4662e662462e7bf3c2a968483478a665d00e717.tar.gz",
+        "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
+    },
+    "niv": {
+        "branch": "master",
+        "description": "Easy dependency management for Nix projects",
+        "homepage": "https://github.com/nmattia/niv",
+        "owner": "nmattia",
+        "repo": "niv",
+        "rev": "9d35b9e4837ab88517210b1701127612c260eccf",
+        "sha256": "0q50xhnm8g2yfyakrh0nly4swyygxpi0a8cb9gp65wcakcgvzvdh",
+        "type": "tarball",
+        "url": "https://github.com/nmattia/niv/archive/9d35b9e4837ab88517210b1701127612c260eccf.tar.gz",
+        "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
+    },
+    "nixpkgs": {
+        "branch": "nixos-20.09",
+        "description": "Nixpkgs/NixOS branches that track the Nixpkgs/NixOS channels",
+        "homepage": null,
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "edb26126d98bc696f4f3e206583faa65d3d6e818",
+        "sha256": "1cl4ka4kk7kh3bl78g06dhiidazf65q8miyzaxi9930d6gwyzkci",
+        "type": "tarball",
+        "url": "https://github.com/NixOS/nixpkgs/archive/edb26126d98bc696f4f3e206583faa65d3d6e818.tar.gz",
+        "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
+    }
+}

@@ -1,5 +1,5 @@
 CLASH = clash
-CLASH_OPTS = -fconstraint-solver-iterations=20 -fclash-inline-limit=200 -fclash-spec-limit=1000 -fexpose-all-unfoldings -fno-worker-wrapper
+CLASH_OPTS = -fconstraint-solver-iterations=40 -fclash-inline-limit=400 -fclash-spec-limit=1000
 FIR_SRC = Filter.hs
 VHDL = vhdl/Main/filter/filter.vhdl
 VERILOG = verilog/Main/filter/filter.v
@@ -17,10 +17,10 @@ $(IMPL): $(VHDL)
 	vivado -mode batch -source synth.tcl
 
 clean:
-	rm -r *.rpt *.dcp *.o *.hi hd_visual verilog vhdl vivado.jou vivado.log
+	rm -r *.rpt *.dcp *.o *.hi hd_visual verilog vhdl *.jou *.log
 
 shrink: # Remove intermediate files, keeping final results
-	rm -r *.o *.hi hd_visual verilog vhdl vivado.jou vivado.log
+	rm -r *.o *.hi hd_visual vhdl
 
 
 # And now targets with human names...

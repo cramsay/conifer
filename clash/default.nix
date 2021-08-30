@@ -7,6 +7,7 @@ mkDerivation {
   pname = "conifer";
   version = "0.1.0.0";
   src = ./.;
+  enableSeparateDataOutput = true;
   libraryHaskellDepends = [
     base binary bytestring clash-prelude containers file-embed
     ghc-typelits-extra ghc-typelits-knownnat ghc-typelits-natnormalise
