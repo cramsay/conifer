@@ -1,5 +1,6 @@
 module ExampleFilters where
 
+{-
 import Clash.Prelude
 
 import Filter.FFA
@@ -121,3 +122,4 @@ createDomain vSystem{vName="SystemNR", vResetPolarity=ActiveLow}
 topEntity c r x = exposeClockResetEnable
                     (firFFA_MCM_HP @16 @SystemNR x)
                     c r (toEnable $ pure True)
+-}

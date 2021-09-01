@@ -1,3 +1,6 @@
+{ nixpkgs ? import ../nix/nixpkgs.nix {} }:
+
+with nixpkgs;
 let
   jupyter = import (builtins.fetchGit {
     url = https://github.com/tweag/jupyterWith;
@@ -6,7 +9,7 @@ let
 
     iPython = jupyter.kernels.iPythonWith {
             name = "python";
-                packages = p: with p; [ numpy ];
+                packages = p: with p; [ numpy plotly sympy pandas ];
                   };
 
   jupyterEnvironment =

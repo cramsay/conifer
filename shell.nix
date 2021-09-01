@@ -4,6 +4,7 @@ with nixpkgs;
 
 mkShell {
   name = "clash-conifer-shell";
+  LC_ALL = "C.UTF-8";
   buildInputs = [
 
     yosys
