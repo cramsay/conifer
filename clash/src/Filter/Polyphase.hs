@@ -6,6 +6,7 @@ module Filter.Polyphase (
 import Clash.Prelude
 import Filter.Serial
 
+{-# NOINLINE reorder #-}
 reorder :: forall i dom n a . (HiddenClockResetEnable dom, KnownNat n, NFDataX a, Num a)
          => SNat i -> Vec n (Signal dom a) -> Vec n (Signal dom a)
 reorder i xs = smap delayFsts $ rotateRightS xs i
@@ -22,9 +23,8 @@ polyphase :: (HiddenClockResetEnable dom, KnownNat m, KnownNat n, NFDataX a, Def
           -> Vec ((n+1)*m) c
           -> Signal dom (Vec (n+1) a) -> Signal dom (Vec (n+1) a)
 polyphase n fir ws xs =
-  let xsMat = map (replicate n) $ unbundle xs
-      firs = map fir (transpose $ unconcat n ws)
-      filtedMat = map (zipWith ($) firs) xsMat
+  let xs' = unbundle xs
+      filtedMat = map (\x-> map (\coeffs->fir coeffs x) (transpose $ unconcat n ws)) xs'
       transpMat = smap reorder filtedMat
       ys = fold (zipWith (\a b -> register 0 $ a+b)) transpMat
   in bundle ys
