@@ -19,5 +19,5 @@ route_design -directive  Explore
 # Report
 report_timing_summary -delay_type min_max -report_unconstrained -check_timing_verbose -max_paths 10 -input_pins -routable_nets -name timing_1 -file ./post_route_timing.rpt
 report_utilization -file ./post_route_util.rpt
-write_checkpoint ./post_route.dcp
+write_checkpoint ./post_route.dcp -force
 

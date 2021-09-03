@@ -15,6 +15,7 @@ let
   jupyterEnvironment =
     jupyter.jupyterlabWith {
       kernels = [ iPython ];
+      directory = ./jupyterlab;
     };
 in
   jupyterEnvironment.env
