@@ -1,0 +1,2 @@
+RADIX = 10;
+COEFDATA = 0, 1, 2, -3;

@@ -1,7 +1,7 @@
 CLASH = clash
 CLASH_OPTS = -fconstraint-solver-iterations=40 -fclash-inline-limit=400 -fclash-spec-limit=1000
 FIR_SRC = Filter.hs
-VHDL = vhdl/Main/filter/filter.vhdl
+VHDL = vhdl/Main.topEntity/filter.vhdl
 VERILOG = verilog/Main/filter/filter.v
 IMPL = post_route.dcp
 

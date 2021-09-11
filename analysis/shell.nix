@@ -4,7 +4,7 @@ with nixpkgs;
 let
   jupyter = import (builtins.fetchGit {
     url = https://github.com/tweag/jupyterWith;
-    rev = "";
+    rev = "6024eb9329c5f47102adc26f541712121bba62d4";
   }) {};
 
     iPython = jupyter.kernels.iPythonWith {
@@ -15,7 +15,9 @@ let
   jupyterEnvironment =
     jupyter.jupyterlabWith {
       kernels = [ iPython ];
-      directory = ./jupyterlab;
+      directory = jupyter.mkDirectoryWith {
+        extensions = [ "jupyterlab-plotly" ];
+      };
     };
 in
   jupyterEnvironment.env

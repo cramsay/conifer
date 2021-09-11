@@ -26,11 +26,18 @@ header = unlines [
 
 footer = "}"
 
+showFund n
+  | n < 0 = "Neg" ++ show (negate n)
+  | otherwise = show n
+
 showSign POS = "+"
 showSign NEG = "-"
 
 showEdge :: Stage -> Fundamental -> Fundamental -> Int -> String
-showEdge = \s c e i -> printf "node_%d_%d:o -> node_%d_%d:e%d;\n" (s-1) e s c i
+showEdge = \s c e i -> printf "node_%d_%s:o -> node_%d_%s:e%d;\n" (s-1) (showFund e) s (showFund c) i
+
+showEdgeI :: Int -> Stage -> Fundamental -> Fundamental -> Int -> String
+showEdgeI = \ind s c e i -> printf "node_%d_%s:o -> node_%d_%s_%d:e%d;\n" (s-1) (showFund e) s (showFund c) ind i
 
 showDotNode :: ((Stage, Fundamental), PNode) -> String
 showDotNode ((s,c), n) = case n of
@@ -58,39 +65,42 @@ showDotNode ((s,c), n) = case n of
                 c
     in node ++ "\n" ++ showEdge s c e 1
   (PNodeShift e shift neg)   ->
-    let node = printf (concat [
+    let c' = if neg then negate e * (2^shift) else e * (2^shift)
+        node = printf (concat [
                   "node [shape = parallelogram,"
-                , "label=\"\\<\\<%d %s\"] node_%d_%d;"
+                , "label=\"\\<\\<%d %s\"] node_%d_%s;"
                 ])
                 shift
                 (if neg then " *(-1)" else "")
                 s
-                c
-    in node  ++ "\n" ++ printf "node_%d_%d:o -> node_%d_%d:e%d;\n" (s-1) e s c (1::Int)
+                (showFund c')
+    in node  ++ "\n" ++ printf "node_%d_%d:o -> node_%d_%s:e%d;\n" (s-1) e s (showFund c') (1::Int)
   (PNodeIn)        -> "node [shape = oval, label=x] node_0_1;"
+  (PNodeZero)      -> printf "node [shape = oval, label=0] node_%d_0;" s
 
 groupDepths (PG pg) = Map.elems $ Map.mapWithKey (\k cs -> map (\a->(k,a)) $ Map.keys cs) pg
 
-setRanks = concat . map (\grp->"{ rank = same; " ++ concat (map (\(s,c)->printf "node_%d_%d; " s c) grp) ++ " }\n")
+setRanks = concat . map (\grp->"{ rank = same; " ++ concat (map (\(s,c)->printf "node_%d_%s; " s (showFund c)) grp) ++ " }\n")
 
-showDotOutput :: Stage -> Fundamental -> String
-showDotOutput s c =
+showDotOutput :: Stage -> Fundamental -> Int -> String
+showDotOutput s c i =
   let node = printf (concat [
                 "node [shape = oval,"
-              , "label=\"%dx\"] node_%d_%d;"
+              , "label=\"%dx\"] node_%d_%s_%d;"
               ])
               c
               (s+1)
-              c
-  in node ++ "\n" ++ showEdge (s+1) c c 1
+              (showFund c)
+              i
+  in node ++ "\n" ++ showEdgeI i (s+1) c c 1
 
 showDot :: [Fundamental] -> PGraph -> String
 showDot cs g = concat
   [header
   ,unlines $ map showDotNode $ concat $ Map.elems $ Map.mapWithKey (\s cs -> Map.toList $ Map.mapKeys (\a->(s,a)) cs) $ unPG g
   ,setRanks $ groupDepths g
-  ,unlines $ map (showDotOutput maxDepth) cs
-  ,setRanks $ [zip (repeat $ maxDepth + 1) cs]
+  ,unlines $ map (\(c,i) -> showDotOutput maxDepth c i) $ zip cs [0..]
+  --,setRanks $ [zip (repeat $ maxDepth + 1) cs]
   ,footer
   ]
   where maxDepth = fst . Map.findMax $ unPG g
