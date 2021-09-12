@@ -1,5 +1,6 @@
 # Create temporary project to build IP from
-create_project ip ./ip -part xczu28dr-ffvg1517-2-e -ip
+set_part "xczu28dr-ffvg1517-2-e"
+create_project ip ./ip -part xczu28dr-ffvg1517-2-e -ip -force
 set_property board_part xilinx.com:zcu111:part0:1.2 [current_project]
 set_property target_language VHDL [current_project]
 set_property target_simulator XSim [current_project]
