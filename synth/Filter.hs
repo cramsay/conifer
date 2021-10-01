@@ -1,3 +1,5 @@
+{-# OPTIONS_GHC -fconstraint-solver-iterations=40 #-}
+
 import Clash.Prelude
 
 import Filter.FFA

@@ -2,55 +2,71 @@
 
 A playground for parallel and multiplierless FIR filters with Clash.
 
+This work, presented first at the [2021 Asilomar conference](https://asilomarsscconf.org/), uses Clash to compose two interesting filter techniques --- the Fast FIR Algorithm (FFA) for smaller parallel structures, and a set of different Multiple Constant Multplication (MCM) blocks for the subfilter arithmetic.
 
-## Environment notes
+Both of these techniques are well studied in the literature but very rarely
+implemented. We argue that this is only an undiscovered perl because of our
+(unfortunately uncommon) choice of language and tooling. Traditionally,
+designers would use __ad-hoc circuit generators__ written in a software
+language. These are used essentially as a black-box and prove difficult to test,
+and even more painful to compose. Clash gives us the tools we need to describe
+and compose these algorithms (with quite a lot of compile-time complexity) in a
+native hardware description language.
 
-Reproducable environments are great, so let's use Nix.
-`cd` to this directory and just run `nix-shell`.
+For more info, see the prepublication versions of our [presentation](https://cramsay.co.uk/content/images/2021/10/asilomar_video.mp4), [slides](https://cramsay.co.uk/content/images/2021/10/asilomar_slides.pdf), and [poster](https://cramsay.co.uk/content/images/2021/10/asilomar_poster.pdf).
 
-Make sure vivado is in your `$PATH` if you want to generate bitstreams.
+## Usage
 
-## Hcub bugs found
+We have packaged our circuit generator as cabal and nix packages in `clash/`.
 
-  * There's that dumb thing about target sets that are all powers of two reducing to empty lists and crashing
+If you want to have a quick play around, the top-level `shell.nix` file will
+source everything you need. You could start by looking at one example filter
+(and our scripts to implement it out-of-context with Vivado --- see the
+makefile) in the `synth/` folder. Make sure you have Vivado in your PATH and you
+have installed the [nix package
+manager](https://nixos.org/manual/nix/stable/#chap-installation).
 
-  * We note that there are discrepancies between the mathematics and the source
-    provided. If we could just express our HDL mathematically, maybe this would
-    be avoided. See distance 3 test case 5. It says we are an adder distance of
-    3 away from a target if A*(S,t) intersects S (page p24). However the
-    definition of the A* function (page 10; Eq. 6) explicitly excludes any
-    elements of the input sets. Therefore this test *should* only every report
-    failure. This is not the case in the SPIRAL implementation In the
-    implementation there *is* some concept of exclusion that comes from storing
-    fundamentals in a set, but this isn't the same thing...
+```console
+me@computer:~/conifer $ nix-shell
 
+[nix-shell:~/conifer]$ clashi synth/Filter.hs 
+Clashi, version 1.4.3 (using clash-lib, version 1.4.3):
+https://clash-lang.org/  :? for help
+[1 of 1] Compiling Main             ( synth/Filter.hs, interpreted )
+Ok, one module loaded.
+*Main> ...
+```
 
-## References
+Have a look at the examples in `clash/src/ExampleFilters.hs` for guidance, or
+just have a browse in `clash/` if you're curious.
 
-### Template Haskell
+## Reproducible Science
 
-https://markkarpov.com/tutorial/th.html is a great tutorial
+We present a _lot_ of utilitation/timing graphs in our publication. We want this
+to be as reproducible as possible. If you want to recreate our results, or do
+something similar with your own extensions, take a look at the `analysis`
+folder. There's another `shell.nix` environment that should include everything
+you need. We offer our result-generating scripts as two Jupyter Notebooks:
 
-https://blog.jle.im/entry/fixed-length-vector-types-in-haskell.html for
-explaining dependent typing with Vecs.
+  1. `ImplImplementationResults.ipynb` --- Scripts to implement our designs (and
+     the LogiCore FirCompiler's as a reference) with Vivado's out-of-context
+     flow, plot the results, and export them as csvs. See `coeffs.py` and
+     `filters.py` for most of the automation and mechanics.
+  2. `CoefficientSymbolicTests.ipynb` --- Presents an experimental verification
+     (using symbolic programming with `sympy`) of the equations we have derived
+     for the number of multiplications our filter structures really need to
+     implement when presented with various common styles of symmetry present in
+     real-world coefficient sets.
 
-  + ScopedTypeVariables and explicit 'forall' lets us use a KnownNat n in the
-    body!
+View and interact with them with:
+```console
+me@computer:~/conifer/analysis $ nix-shell --option sandbox false --command "jupyter lab"
+```
+This should open a browser window with the Jupyter Lab interface in a new tab.
 
-### Generating lookups for adder costs
+## License
 
-Found some example code @ http://spiral.ece.cmu.edu/mcm/gen.html Download
-synth-jan-14-2009.tar.gz Good reference, but it's just a lookup table.
-
-See Dempster and Macleod's (Multiplication by an integer using minimum
-adders)[https://ieeexplore.ieee.org/document/297467/] for details.
-
-Original BH (Bull and Hollock) paper (Primitive operator digital
-filters)[https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=258032]
-actually has algorithms!
-
-Nice comparison @ Arithmetic Circuits for DSP Applications
-edited by Pramod Kumar Meher, Thanos Stouraitis
-
-Only full implementation I found is a perl script that generates verilog!
-https://github.com/verilog-to-routing/vtr-verilog-to-routing/blob/master/vtr_flow/benchmarks/arithmetic/multless_consts/verilog/firgen/multBlockGen.pl
+Conifer is licensed under [GPLv2](./LICENSE). Please feel free to use it
+accordingly for educational and academic uses, including extending it for your
+own publications. For commercial uses, this license gets *much* more restrictive.
+Contact us if you want to negotiate a new license for commercial use.
