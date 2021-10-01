@@ -1,15 +1,15 @@
 # Conifer
 
-A playground for parallel and multiplierless FIR filters with Clash.
+> A playground for parallel and multiplierless FIR filters with Clash.
 
-This work, presented first at the [2021 Asilomar conference](https://asilomarsscconf.org/), uses Clash to compose two interesting filter techniques --- the Fast FIR Algorithm (FFA) for smaller parallel structures, and a set of different Multiple Constant Multplication (MCM) blocks for the subfilter arithmetic.
+This work, presented first at the [2021 Asilomar conference](https://asilomarsscconf.org/), uses Clash to compose two interesting filter techniques --- the Fast FIR Algorithm (FFA) for smaller parallel structures, and a set of different Multiple Constant Multplication (MCM) blocks for the subfilter arithmetic. This is presented as a solution for front-end digital filtering in RFSoC devices, but is actually quite widely applicible.
 
 Both of these techniques are well studied in the literature but very rarely
 implemented. We argue that this is only an undiscovered perl because of our
 (unfortunately uncommon) choice of language and tooling. Traditionally,
-designers would use __ad-hoc circuit generators__ written in a software
-language. These are used essentially as a black-box and prove difficult to test,
-and even more painful to compose. Clash gives us the tools we need to describe
+designers would use _ad-hoc circuit generators_ written in a software
+language. These are used essentially as a black-box, prove difficult to test,
+and are even more painful to compose. Clash gives us the tools we need to describe
 and compose these algorithms (with quite a lot of compile-time complexity) in a
 native hardware description language.
 
@@ -21,8 +21,7 @@ We have packaged our circuit generator as cabal and nix packages in `clash/`.
 
 If you want to have a quick play around, the top-level `shell.nix` file will
 source everything you need. You could start by looking at one example filter
-(and our scripts to implement it out-of-context with Vivado --- see the
-makefile) in the `synth/` folder. Make sure you have Vivado in your PATH and you
+(and our scripts to implement it out-of-context with Vivado) in the `synth/` folder. Make sure you have Vivado in your PATH and you
 have installed the [nix package
 manager](https://nixos.org/manual/nix/stable/#chap-installation).
 
@@ -42,15 +41,15 @@ just have a browse in `clash/` if you're curious.
 
 ## Reproducible Science
 
-We present a _lot_ of utilitation/timing graphs in our publication. We want this
+We present a _lot_ of utilisation/timing results in our publication. We want this
 to be as reproducible as possible. If you want to recreate our results, or do
 something similar with your own extensions, take a look at the `analysis`
 folder. There's another `shell.nix` environment that should include everything
 you need. We offer our result-generating scripts as two Jupyter Notebooks:
 
-  1. `ImplImplementationResults.ipynb` --- Scripts to implement our designs (and
-     the LogiCore FirCompiler's as a reference) with Vivado's out-of-context
-     flow, plot the results, and export them as csvs. See `coeffs.py` and
+  1. `ImplementationResults.ipynb` --- Scripts to implement our designs (and
+     the LogiCore FIR Compiler's as a reference) with Vivado's out-of-context
+     flow, plot the results, and export them as CSVs. See `coeffs.py` and
      `filters.py` for most of the automation and mechanics.
   2. `CoefficientSymbolicTests.ipynb` --- Presents an experimental verification
      (using symbolic programming with `sympy`) of the equations we have derived
