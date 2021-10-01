@@ -111,13 +111,24 @@ fp_post_rec ::
      (Vec (2^n) (Signal dom a) -> Vec (2^n) (Signal dom a)) ->
      (Vec (3^n) (Signal dom a) -> Vec (2^n) (Signal dom a)) ->
      Vec (3^(n+1)) (Signal dom a) -> Vec (2^(n+1)) (Signal dom a)
+{- Fully pipelined version
 fp_post_rec swap_f rec_f xs =
   let xs' = map rec_f $ unconcat' d3 xs
-      odds = zipWith3 (\x y z -> delay def (y - z - x)) (xs' !! 0) (xs' !! 1) (xs' !! 2)
-      swps  = swap_f $ xs' !! 2
+      z = delayV $ xs' !! 2
+      odds = zipWith3 (\x y z -> delay def (delay def (y - x) - z)) (xs' !! 0) (xs' !! 1) z
+      swps  = swap_f z
       swps_d = zipWith ($) (delay def +>> repeat id) swps
-      evens = map (delay def) $ zipWith (+) (xs' !! 0) swps_d
-  in evens ++ odds
+      evens = delayV $ zipWith (+) (delayV (xs' !! 0)) swps_d
+      delayV = map (delay def)
+  in evens ++ odds -}
+fp_post_rec swap_f rec_f xs =
+   let xs' = map rec_f $ unconcat' d3 xs
+       odds = zipWith3 (\x y z -> delay def (y - z - x)) (xs' !! 0) (xs' !! 1) (xs' !! 2)
+       swps  = swap_f $ xs' !! 2
+       swps_d = zipWith ($) (delay def +>> repeat id) swps
+       evens = map (delay def) $ zipWith (+) (xs' !! 0) swps_d
+   in evens ++ odds
+
 
 --------------------------------------------------------------------------------
 -- If we wanted to define our x2, x4, and x8 filters without template haskell,
@@ -156,7 +167,9 @@ genFFAGivenFirs :: SNat n -> Q Exp
 genFFAGivenFirs sn = [| \f -> bundle . $(reorder n) . $(post n) . f . $(pre n) . unbundle |]
   where
   n = snatToInteger sn
-  pre  1 = [|id|]
+  {- Fully pipelined
+  pre  1 = [| map (delay def) |] -}
+  pre  1 = [| id |]
   pre  n = [|fp_pre_rec $(pre (n `div` 2))|]
   swap 2 = [|id|]
   swap n = [|hSwap $(swap (n `div` 2))|]

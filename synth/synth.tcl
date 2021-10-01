@@ -6,7 +6,7 @@ add_files -fileset constrs_1 synth.xdc
 set_property target_constrs_file synth.xdc [current_fileset -constrset]
 
 # Synthesise out of context
-synth_design -mode out_of_context  -part xczu28dr-ffvg1517-2-e -directive AreaOptimized_medium
+synth_design -mode out_of_context  -part xczu28dr-ffvg1517-2-e
 report_utilization -file ./post_synth_util.rpt
 opt_design -directive  Explore
 power_opt_design

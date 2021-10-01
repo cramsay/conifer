@@ -5,4 +5,5 @@ clash/dist-newstyle
 clash/dist
 analysis/.ipynb_checkpoints/
 analysis/outputs/
+analysis/__pycache__/
 
