@@ -23,6 +23,8 @@ For more info, see the prepublication versions of our
 [slides](https://cramsay.co.uk/content/images/2021/10/asilomar_slides.pdf), and
 [poster](https://cramsay.co.uk/content/images/2021/10/asilomar_poster.pdf).
 
+![Poster as a horrible jpeg](https://cramsay.co.uk/content/images/2021/10/asilomar_poster.jpg)
+
 ## Usage
 
 We have packaged our circuit generator as cabal and nix packages in `clash/`.
