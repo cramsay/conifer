@@ -49,7 +49,7 @@ Ok, one module loaded.
 Have a look at the examples in `clash/src/ExampleFilters.hs` for guidance, or
 just have a browse in `clash/` if you're curious.
 
-## Reproducible Science
+## Reproducible Research
 
 We present a _lot_ of utilisation/timing results in our publication. We want this
 to be as reproducible as possible. If you want to recreate our results, or do

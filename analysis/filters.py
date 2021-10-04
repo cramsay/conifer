@@ -81,6 +81,7 @@ class Filter():
                 'group': self.output_dir,
                 'name': self.name,
                 'structure': self.fir_name,
+                'coeff_class': self.coeffs.__class__.__name__,
                 'in_width': self.width,
                 'c_width': self.coeffs.width,
                 'parallelism': self.p,
