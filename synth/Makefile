@@ -4,6 +4,7 @@ FIR_SRC = Filter.hs
 VHDL = vhdl/Main.topEntity/fir_dut.vhdl
 VERILOG = verilog/Main/filter/fir_dut.v
 IMPL = post_route.dcp
+SIM = sim_impulse.ghw
 
 all: $(IMPL)
 
@@ -13,14 +14,17 @@ $(VHDL): $(FIR_SRC)
 $(VERILOG): $(FIR_SRC)
 	$(CLASH) $(CLASH_OPTS) --verilog $(FIR_SRC);
 
+$(SIM): $(VHDL)
+	./simulate.sh
+
 $(IMPL): $(VHDL)
 	vivado -mode batch -source synth.tcl
 
 clean:
-	rm -r *.rpt *.dcp *.o *.hi hd_visual verilog vhdl *.jou *.log
+	rm -r *.rpt *.dcp *.o *.hi hd_visual verilog vhdl *.jou *.log *.ghw work-* *.dyn_*
 
 shrink: # Remove intermediate files, keeping final results
-	rm -r *.o *.hi hd_visual vhdl
+	rm -r *.o *.hi hd_visual vhdl *.ghw work-* *.dyn_*
 
 
 # And now targets with human names...
@@ -28,6 +32,8 @@ shrink: # Remove intermediate files, keeping final results
 vhdl: $(VHDL)
 
 verilog: $(VERILOG)
+
+sim : $(SIM)
 
 impl: $(IMPL)
 
