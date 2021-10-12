@@ -120,7 +120,8 @@ fp_post_rec swap_f rec_f xs =
       swps_d = zipWith ($) (delay def +>> repeat id) swps
       evens = delayV $ zipWith (+) (delayV (xs' !! 0)) swps_d
       delayV = map (delay def)
-  in evens ++ odds -}
+  in evens ++ odds
+-}
 fp_post_rec swap_f rec_f xs =
    let xs' = map rec_f $ unconcat' d3 xs
        odds = zipWith3 (\x y z -> delay def (y - z - x)) (xs' !! 0) (xs' !! 1) (xs' !! 2)

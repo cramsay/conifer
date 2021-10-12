@@ -11,7 +11,7 @@ create_ip -name fir_compiler -vendor xilinx.com -library ip -version 7.2 -module
 set_property -dict [list \
   CONFIG.Component_Name {fir} \
   CONFIG.CoefficientSource {COE_File} \
-  CONFIG.Coefficient_File {../../weights.coe} \
+  CONFIG.Coefficient_File {../../../weights.coe} \
   CONFIG.Sample_Frequency {4000} \
   CONFIG.Clock_Frequency {500} \
   CONFIG.Coefficient_Width {16} \

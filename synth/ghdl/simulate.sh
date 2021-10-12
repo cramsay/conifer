@@ -5,13 +5,13 @@ ghdl clean
 
 # Load sources (careful of order here... need any type defs first, reorder
 # helpers, then DUT)
-ghdl -a --std=08 --ieee=synopsys vhdl/Main.topEntity/fir_dut_types.vhdl;
-for f in vhdl/Main.topEntity/reorder*.vhdl
+ghdl -a --std=08 --ieee=synopsys ../vhdl/Main.topEntity/fir_dut_types.vhdl;
+for f in ../vhdl/Main.topEntity/reorder*.vhdl
 do
   [ -f "$fname" ] || continue
   ghdl -a --std=08 --ieee=synopsys $f;
 done;
-ghdl -a --std=08 --ieee=synopsys vhdl/Main.topEntity/fir_dut.vhdl;
+ghdl -a --std=08 --ieee=synopsys ../vhdl/Main.topEntity/fir_dut.vhdl;
 
 # Load testbench, run, and export wavefile
 ghdl -a --std=08 --ieee=synopsys impulse_tb.vhdl

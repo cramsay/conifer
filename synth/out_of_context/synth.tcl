@@ -1,5 +1,5 @@
 # Add sources
-add_files { vhdl/ }
+add_files { ../vhdl/ }
 update_compile_order -fileset sources_1
 
 add_files -fileset constrs_1 synth.xdc
