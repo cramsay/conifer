@@ -21,6 +21,8 @@ proc createSSR {} {
     CONFIG.Data_Fractional_Bits {0} \
     CONFIG.Output_Rounding_Mode {Full_Precision} \
     CONFIG.Filter_Architecture {Systolic_Multiply_Accumulate} \
+    CONFIG.Filter_Type {Single_Rate} \
+
   ] $fir
   file copy ../weights.coe ./prj.srcs/weights.coe
 }
@@ -42,6 +44,7 @@ update_compile_order -fileset sources_1
 make_wrapper -files [get_files ./prj.srcs/sources_1/bd/design_1/design_1.bd] -top
 add_files -norecurse ./prj.srcs/sources_1/bd/design_1/hdl/design_1_wrapper.vhd
 set_property top design_1_wrapper [current_fileset]
+generate_target all [get_ips fir]
 update_compile_order -fileset sources_1
 
 # Build

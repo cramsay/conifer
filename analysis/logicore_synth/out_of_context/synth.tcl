@@ -28,6 +28,7 @@ set_property -dict [list \
   CONFIG.Data_Fractional_Bits {0} \
   CONFIG.Output_Rounding_Mode {Full_Precision} \
   CONFIG.Filter_Architecture {Systolic_Multiply_Accumulate} \
+  CONFIG.Filter_Type {Single_Rate} \
 ] [get_ips fir]
 
 generate_target {instantiation_template} [get_files ./ip/fir/fir.xci]
@@ -38,6 +39,7 @@ close_project
 # Set up out-of-project sources
 
 read_ip ./ip/fir/fir.xci
+generate_target all [get_ips]
 #add_files { ./ip/fir/synth/fir.vhd }
 set_property top fir [current_fileset]
 update_compile_order -fileset [current_fileset]

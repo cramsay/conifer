@@ -1,7 +1,7 @@
 from textwrap import dedent
 import fileinput
 from IPython import get_ipython
-
+import coeffs
 
 _ipython = get_ipython()
 
@@ -114,6 +114,20 @@ class ClashFilter(Filter):
         pass
     
     @property
+    def out_p(self):
+        if isinstance(self.coeffs, coeffs.CoeffsHalfBand):
+            return self.p//2
+        else:
+            return self.p
+    
+    @property
+    def pre_f(self):
+        if isinstance(self.coeffs, coeffs.CoeffsHalfBand):
+            return 'fmap (head . transpose . unconcat d2) $'
+        else:
+            return ''
+        
+    @property
     def src(self):
         return dedent("""
                import Clash.Prelude
@@ -175,9 +189,9 @@ class PolyDirectFilter(ClashFilter):
     def _fir_src(self):
         return f"""
                fir :: HiddenClockResetEnable dom
-                   => Signal dom (Vec {self.p} (Signed {self.width}))
-                   -> Signal dom (Vec {self.p} (Signed ({self.width} + {self.coeffs.width} + CLog 2 {self.subfilt_taps} + CLog 2 {self.p})))
-               fir xs = polyphase (SNat :: SNat {self.p}) firDirect (map resize $ {self.coeffs.coeffs_vec}) (fmap (map resize) xs)
+                   => Signal dom (Vec {self.p}     (Signed {self.width}))
+                   -> Signal dom (Vec {self.out_p} (Signed ({self.width} + {self.coeffs.width} + CLog 2 {self.subfilt_taps} + CLog 2 {self.p})))
+               fir xs = {self.pre_f} polyphase (SNat :: SNat {self.p}) firDirect (map resize $ {self.coeffs.coeffs_vec}) (fmap (map resize) xs)
                """
 
     
@@ -196,9 +210,9 @@ class PolyMcmFilter(ClashFilter):
     def _fir_src(self):
         return f"""
                fir :: HiddenClockResetEnable dom
-                   => Signal dom (Vec {self.p} (Signed {self.width}))
-                   -> Signal dom (Vec {self.p} (Signed ({self.width} + {self.coeffs.width} + CLog 2 {self.subfilt_taps} + CLog 2 {self.p})))
-               fir xs = polyphase_MCM
+                   => Signal dom (Vec {self.p}     (Signed {self.width}))
+                   -> Signal dom (Vec {self.out_p} (Signed ({self.width} + {self.coeffs.width} + CLog 2 {self.subfilt_taps} + CLog 2 {self.p})))
+               fir xs = {self.pre_f} polyphase_MCM
                           (SNat :: SNat {self.p})
                           $(mcmPipelinedDepthHwTH HcubShallow 3 (toList $ map fromIntegral {self.coeffs.coeffs_vec}))
                           (fmap (map resize) xs)
@@ -219,9 +233,9 @@ class FfaDirectFilter(ClashFilter):
     def _fir_src(self):
         return f"""
                fir :: HiddenClockResetEnable dom
-                   => Signal dom (Vec {self.p} (Signed {self.width}))
-                   -> Signal dom (Vec {self.p} (Signed ({self.width} + {self.coeffs.width} + CLog 2 {self.subfilt_taps}+ 4*(CLog 2 {self.p}))))
-               fir xs = $(genFFA (SNat :: SNat {self.p}))
+                   => Signal dom (Vec {self.p}     (Signed {self.width}))
+                   -> Signal dom (Vec {self.out_p} (Signed ({self.width} + {self.coeffs.width} + CLog 2 {self.subfilt_taps}+ 4*(CLog 2 {self.p}))))
+               fir xs = {self.pre_f} $(genFFA (SNat :: SNat {self.p}))
                             firDirect
                             (map resize {self.coeffs.coeffs_vec})
                             (fmap (map resize) xs)
@@ -243,9 +257,9 @@ class FfaMcmFilter(ClashFilter):
     def _fir_src(self):
         return f"""
                fir :: HiddenClockResetEnable dom
-                   => Signal dom (Vec {self.p} (Signed {self.width}))
-                   -> Signal dom (Vec {self.p} (Signed ({self.width} + {self.coeffs.width} + CLog 2 {self.subfilt_taps}+ 4*(CLog 2 {self.p}))))
-               fir xs = $(genFFA_MCM (mcmPipelinedDepthHwTH HcubShallow 3)
+                   => Signal dom (Vec {self.p}     (Signed {self.width}))
+                   -> Signal dom (Vec {self.out_p} (Signed ({self.width} + {self.coeffs.width} + CLog 2 {self.subfilt_taps}+ 4*(CLog 2 {self.p}))))
+               fir xs = {self.pre_f} $(genFFA_MCM (mcmPipelinedDepthHwTH HcubShallow 3)
                                      (SNat :: SNat {self.p})
                                      (map fromIntegral {self.coeffs.coeffs_vec})
                         ) (fmap (map resize) xs)
@@ -286,12 +300,14 @@ class SsrFilter(Filter):
 
 
         # Set parallelism in build script
+        filter_type = 'Decimation' if isinstance(self.coeffs, coeffs.CoeffsHalfBand) else 'Single_Rate'
         with fileinput.FileInput(f'{self.synth_dir}/{run}/synth.tcl', inplace=True) as f:
             for line in f:
-                print(line.replace('CONFIG.Sample_Frequency {4000}', f'CONFIG.Sample_Frequency {{{self.fclk*self.p}}}'
-                         ).replace('CONFIG.Clock_Frequency {500}'  , f'CONFIG.Clock_Frequency {{{self.fclk}}}'
-                         ).replace('CONFIG.Coefficient_Width {16}' , f'CONFIG.Coefficient_Width {{{self.coeffs.width}}}'
-                         ).replace('CONFIG.Data_Width {16}'        , f'CONFIG.Data_Width {{{self.width}}}'
+                print(line.replace('CONFIG.Sample_Frequency {4000}'  , f'CONFIG.Sample_Frequency {{{self.fclk*self.p}}}'
+                         ).replace('CONFIG.Clock_Frequency {500}'    , f'CONFIG.Clock_Frequency {{{self.fclk}}}'
+                         ).replace('CONFIG.Coefficient_Width {16}'   , f'CONFIG.Coefficient_Width {{{self.coeffs.width}}}'
+                         ).replace('CONFIG.Data_Width {16}'          , f'CONFIG.Data_Width {{{self.width}}}'
+                         ).replace('CONFIG.Filter_Type {Single_Rate}', f'CONFIG.Filter_Type {{{filter_type}}}'
                          ), end='')
         
         # Go!

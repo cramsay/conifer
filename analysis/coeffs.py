@@ -44,14 +44,20 @@ class Coeffs():
         pass
     
     @property
+    def coeffs_no_pad(self):
+        return self.coeffs
+    
+    @property
     def coeffs_vec(self):
         return '(' + ':>'.join([f'({c})' for c in self.coeffs]) + \
                f':> Nil :: Vec {len(self.coeffs)} (Signed {self.width}) )'
     
     @property
     def coeffs_coe(self):
+        # Important to use coeffs_no_pad here because Fir Compiler doesn't check
+        # for zeros while identifying symmetries.
         return 'RADIX = 10;\n' + \
-               'COEFDATA = ' + ','.join([str(c) for c in self.coeffs]) + ';'
+               'COEFDATA = ' + ','.join([str(c) for c in self.coeffs_no_pad]) + ';'
     
     @property
     def name(self):
@@ -104,6 +110,10 @@ class CoeffsType1Pad(Coeffs):
         ws = np.append(ws, [0])
         return np.round(ws * (2**(self.width-1)-1)).astype(int)
     
+    @property
+    def coeffs_no_pad(self):
+        return self.coeffs[:-1]
+    
     
 class CoeffsType2(Coeffs):
     """ Coeffs for Type-2 filters (or Type-4, depending on `resp`) """
@@ -142,3 +152,7 @@ class CoeffsHalfBand(Coeffs):
     def coeffs(self):
         ws = firwin(self.taps+1, 0.5)[1:]
         return np.round(ws * (2**(self.width-1)-1)).astype(int)
+    
+    @property
+    def coeffs_no_pad(self):
+        return self.coeffs[:-1]

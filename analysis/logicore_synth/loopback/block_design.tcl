@@ -123,10 +123,8 @@ set bCheckIPsPassed 1
 set bCheckIPs 1
 if { $bCheckIPs == 1 } {
    set list_check_ips "\ 
-xilinx.com:ip:axis_clock_converter:1.1\
 xilinx.com:ip:axis_dwidth_converter:1.1\
 xilinx.com:ip:fir_compiler:7.2\
-xilinx.com:ip:proc_sys_reset:5.0\
 "
 
    set list_ips_missing ""
@@ -191,20 +189,14 @@ proc create_root_design { parentCell } {
 
   # Create interface ports
   set M_AXIS_0 [ create_bd_intf_port -mode Master -vlnv xilinx.com:interface:axis_rtl:1.0 M_AXIS_0 ]
-  set_property -dict [ list \
-   CONFIG.FREQ_HZ {500000000} \
-   CONFIG.PHASE {0.0} \
-   ] $M_AXIS_0
 
   set S_AXIS_0 [ create_bd_intf_port -mode Slave -vlnv xilinx.com:interface:axis_rtl:1.0 S_AXIS_0 ]
   set_property -dict [ list \
-   CONFIG.FREQ_HZ {500000000} \
    CONFIG.HAS_TKEEP {0} \
    CONFIG.HAS_TLAST {0} \
    CONFIG.HAS_TREADY {1} \
    CONFIG.HAS_TSTRB {0} \
    CONFIG.LAYERED_METADATA {undef} \
-   CONFIG.PHASE {0.0} \
    CONFIG.TDATA_NUM_BYTES {1} \
    CONFIG.TDEST_WIDTH {0} \
    CONFIG.TID_WIDTH {0} \
@@ -213,24 +205,8 @@ proc create_root_design { parentCell } {
 
 
   # Create ports
-  set clk [ create_bd_port -dir I -type clk clk ]
+  set aclk [ create_bd_port -dir I -type clk aclk ]
   set rst [ create_bd_port -dir I -type rst rst ]
-  set slow_clock [ create_bd_port -dir I -type clk -freq_hz 500000000 slow_clock ]
-  set_property -dict [ list \
-   CONFIG.PHASE {0.0} \
- ] $slow_clock
-
-  # Create instance: axis_clock_converter_0, and set properties
-  set axis_clock_converter_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:axis_clock_converter:1.1 axis_clock_converter_0 ]
-  set_property -dict [ list \
-   CONFIG.TDATA_NUM_BYTES {48} \
- ] $axis_clock_converter_0
-
-  # Create instance: axis_clock_converter_1, and set properties
-  set axis_clock_converter_1 [ create_bd_cell -type ip -vlnv xilinx.com:ip:axis_clock_converter:1.1 axis_clock_converter_1 ]
-  set_property -dict [ list \
-   CONFIG.TDATA_NUM_BYTES {48} \
- ] $axis_clock_converter_1
 
   # Create instance: axis_dwidth_converter_0, and set properties
   set axis_dwidth_converter_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:axis_dwidth_converter:1.1 axis_dwidth_converter_0 ]
@@ -249,24 +225,15 @@ proc create_root_design { parentCell } {
   # Create instance: fir, and set properties
   createSSR
 
-  # Create instance: rst_clk_wiz_100M, and set properties
-  set rst_clk_wiz_100M [ create_bd_cell -type ip -vlnv xilinx.com:ip:proc_sys_reset:5.0 rst_clk_wiz_100M ]
-
   # Create interface connections
   connect_bd_intf_net -intf_net S_AXIS_0_1 [get_bd_intf_ports S_AXIS_0] [get_bd_intf_pins axis_dwidth_converter_0/S_AXIS]
-  connect_bd_intf_net -intf_net axis_clock_converter_0_M_AXIS [get_bd_intf_pins axis_clock_converter_0/M_AXIS] [get_bd_intf_pins fir/S_AXIS_DATA]
-  connect_bd_intf_net -intf_net axis_clock_converter_1_M_AXIS [get_bd_intf_pins axis_clock_converter_1/M_AXIS] [get_bd_intf_pins axis_dwidth_converter_1/S_AXIS]
-  connect_bd_intf_net -intf_net axis_dwidth_converter_0_M_AXIS [get_bd_intf_pins axis_clock_converter_0/S_AXIS] [get_bd_intf_pins axis_dwidth_converter_0/M_AXIS]
+  connect_bd_intf_net -intf_net axis_dwidth_converter_0_M_AXIS [get_bd_intf_pins axis_dwidth_converter_0/M_AXIS] [get_bd_intf_pins fir/S_AXIS_DATA]
   connect_bd_intf_net -intf_net axis_dwidth_converter_1_M_AXIS [get_bd_intf_ports M_AXIS_0] [get_bd_intf_pins axis_dwidth_converter_1/M_AXIS]
-  connect_bd_intf_net -intf_net fir_compiler_0_M_AXIS_DATA [get_bd_intf_pins axis_clock_converter_1/S_AXIS] [get_bd_intf_pins fir/M_AXIS_DATA]
+  connect_bd_intf_net -intf_net fir_M_AXIS_DATA [get_bd_intf_pins axis_dwidth_converter_1/S_AXIS] [get_bd_intf_pins fir/M_AXIS_DATA]
 
   # Create port connections
-  connect_bd_net -net axis_clock_converter_0_m_axis_tvalid [get_bd_pins axis_clock_converter_0/m_axis_tvalid] [get_bd_pins axis_clock_converter_1/s_axis_tvalid]
-  connect_bd_net -net axis_clock_converter_1_s_axis_tready [get_bd_pins axis_clock_converter_0/m_axis_tready] [get_bd_pins axis_clock_converter_1/s_axis_tready]
-  connect_bd_net -net clk_0_1 [get_bd_ports clk] [get_bd_pins axis_clock_converter_0/m_axis_aclk] [get_bd_pins axis_clock_converter_1/s_axis_aclk] [get_bd_pins fir/aclk]
-  connect_bd_net -net rst_0_1 [get_bd_ports rst] [get_bd_pins axis_clock_converter_0/m_axis_aresetn] [get_bd_pins axis_clock_converter_1/s_axis_aresetn] [get_bd_pins rst_clk_wiz_100M/ext_reset_in]
-  connect_bd_net -net rst_clk_wiz_100M_peripheral_aresetn [get_bd_pins axis_clock_converter_0/s_axis_aresetn] [get_bd_pins axis_clock_converter_1/m_axis_aresetn] [get_bd_pins axis_dwidth_converter_0/aresetn] [get_bd_pins axis_dwidth_converter_1/aresetn] [get_bd_pins rst_clk_wiz_100M/peripheral_aresetn]
-  connect_bd_net -net s_axis_aclk_0_1 [get_bd_ports slow_clock] [get_bd_pins axis_clock_converter_0/s_axis_aclk] [get_bd_pins axis_clock_converter_1/m_axis_aclk] [get_bd_pins axis_dwidth_converter_0/aclk] [get_bd_pins axis_dwidth_converter_1/aclk] [get_bd_pins rst_clk_wiz_100M/slowest_sync_clk]
+  connect_bd_net -net clk_0_1 [get_bd_ports aclk] [get_bd_pins axis_dwidth_converter_0/aclk] [get_bd_pins axis_dwidth_converter_1/aclk] [get_bd_pins fir/aclk]
+  connect_bd_net -net rst_0_1 [get_bd_ports rst] [get_bd_pins axis_dwidth_converter_0/aresetn] [get_bd_pins axis_dwidth_converter_1/aresetn] [get_bd_pins fir/aresetn]
 
   # Create address segments
 
